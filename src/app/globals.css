@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+textarea {
+    resize: none;
+    /* Impede o redimensionamento pelo usuário */
+}
+
+.rm-bg[type='checkbox']:checked {
+    background-image: none;
+}
+
+[type='checkbox']:focus, [type='radio']:focus {
+    --tw-ring-color: transparent;
+}
