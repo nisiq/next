@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { useState } from 'react';
 import { TCreateRegSchema } from '@/lib/types';
 import { FieldValues, useForm } from "react-hook-form";
 import { InputTagBrook } from '../InputTagBrook';
@@ -8,6 +8,12 @@ import { FaCheckCircle } from "react-icons/fa";
 
 
 export default function CreateRegForm({ setShowModal }: any) {
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    const handleTagChange = (tags: string[]) => {
+        setSelectedTags(tags);
+    };
+
     const {
         register,
         handleSubmit,
@@ -16,15 +22,81 @@ export default function CreateRegForm({ setShowModal }: any) {
     } = useForm<TCreateRegSchema>();
 
     const onSubmit = async (data: FieldValues) => {
-        const response = await fetch("", {
+        let participants:string = selectedTags.join(", ");
+        console.log(participants)
+        data.participants = participants;
+        const response = await fetch("/api/registers", {
             method: "POST",
             body: JSON.stringify(data),
             headers: {
                 "Content-Type": "application/json",
             },
-        })
-    }
+        });
 
+        const responseData = await response.json();
+        if (!response.ok) {
+            alert("Submitting form failed!");
+            return;
+        }
+
+        if (responseData.errors) {
+            const errors = responseData.errors;
+            if (errors.title) {
+                setError("title", {
+                    type: "server",
+                    message: errors.title,
+                });
+            }
+            else if (errors.date_due) {
+                setError("date_due", {
+                    type: "server",
+                    message: errors.date_due,
+                });
+            } else if (errors.description) {
+                setError("description", {
+                    type: "server",
+                    message: errors.description,
+                });
+            } else if (errors.participants) {
+                setError("participants", {
+                    type: "server",
+                    message: errors.participants,
+                });
+            } else if (errors.url) {
+                setError("url", {
+                    type: "server",
+                    message: errors.url,
+                });
+            }
+            else if (errors.action) {
+                setError("action", {
+                    type: "server",
+                    message: errors.action,
+                });
+            }
+
+            else {
+                alert("Something went wrong!");
+            }
+        }
+
+        if (responseData.success) {
+            setShowModal(false);
+            toast('Tarefa Registrada com sucesso!', {
+                type: "success",
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                transition: Bounce,
+                className: "bg-[#C9FCFF] text-black",
+                progressClassName: "bg-palette-sea-green",
+                icon: ({ theme, type }) => <FaCheckCircle color="#18837E" />
+            });
+        }
+    }
 
     return (
         <form id="formRegCreate" onSubmit={handleSubmit(onSubmit)} className="p-8 py-4 flex flex-col justify-items-start ">
@@ -32,7 +104,7 @@ export default function CreateRegForm({ setShowModal }: any) {
             <div>
                 <div className={`w-full flex flex-col mb-4 lg:mb-2`}>
                     <label className="text-md text-start font-semibold text-palette-blue">Título do Registro</label>
-                    <input {...register("title")} type={"text"} className={`rounded h-9 p-2 ${errors.title?.message ? 'border border-red-500' : 'border border-pallete-line'}`} />
+                    <input {...register("title")} type={"text"} className={`rounded h-9 p-2 ${errors.title?.message ? 'border border-red-500' : 'border border-gray-300'}`} />
                     {errors.title && (
                         <small className='text-red-500'>{`${errors.title.message}`}</small>)}
                 </div>
@@ -41,20 +113,20 @@ export default function CreateRegForm({ setShowModal }: any) {
             <div className={`w-[100%] flex flex-col mb-4 lg:mb-2`}>
                 <label className="text-md text-start font-semibold text-palette-blue lg:text-sm">Data</label>
                 <input
-                    type={"date"} {...register("date")} className={`rounded h-9 p-2 ${errors.date_due?.message ? 'border border-red-500' : 'border border-pallete-line'}`}
+                    type={"date"} {...register("date_due")} className={`rounded h-9 p-2 ${errors.date_due?.message ? 'border border-red-500' : 'border border-gray-300'}`}
                 />
-                {errors.date && (
-                    <small className='text-red-500'>{`${errors.date.message}`}</small>
+                {errors.date_due && (
+                    <small className='text-red-500'>{`${errors.date_due.message}`}</small>
                 )}
             </div>
 
             <div className={`flex flex-col mb-4`}>
                 <label className="text-md text-start font-semibold text-palette-blue">Participantes</label>
-                <InputTagBrook buttonColor='palette-blue' myChange={function (value: string[]): void {
-                    throw new Error('Function not implemented.');
-                }} {...register("participants")}
+                <InputTagBrook buttonColor='palette-blue' myChange={handleTagChange}
+
+                    {...register("participants")}
                     name="participants"
-                    className={`${errors.participants?.message ? 'border border-red-500' : 'border-pallete-line'}`}
+                    className={`${errors.participants?.message ? 'border border-red-500' : 'border-gray-300'}`}
                 />
                 {errors.participants && (
                     <small className='text-red-500'>{`${errors.participants.message}`}</small>
@@ -88,9 +160,8 @@ export default function CreateRegForm({ setShowModal }: any) {
                     <label className="text-md text-start font-semibold text-palette-blue">Ação Principal</label>
                     <select
                         {...register("action")}
-                        className={`${errors.action?.message ? 'border border-red-500' : 'border-pallete-line'} `}
+                        className={`${errors.action?.message ? 'border border-red-500' : 'border-pallete-line border-gray-300 rounded-md border'} `}
                         name="action"
-
                     >
                         <option value="Desenvolvimento">Desenvolvimento</option>
                         <option value="Fluxograma">Fluxograma</option>
@@ -111,4 +182,4 @@ export default function CreateRegForm({ setShowModal }: any) {
             </div>
         </form>
     );
-};
+}

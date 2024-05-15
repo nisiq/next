@@ -84,7 +84,7 @@ export default function CreateTaskForm({ setShowModal }: any) {
                 icon: ({ theme, type }) => <FaCheckCircle color="#18837E" />
             });
 
-            revalidateTasks()
+        
         }
     }
 

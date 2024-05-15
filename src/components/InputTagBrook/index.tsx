@@ -46,7 +46,7 @@ const InputTagBrook = forwardRef<HTMLInputElement, InputTagsProps>(
 					<input
 						{...inputProps}
 						placeholder="Search your tags..."
-						maxLength={10}
+						maxLength={20}
 						value={value}
 						type="text"
 						className={`border border-palette-line bg-gray-50 text-gray-900 text-sm rounded w-full focus:border-none ${

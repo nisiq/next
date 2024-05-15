@@ -65,7 +65,7 @@ const Diario = () => {
                 </div>
             </div>
 
-            <Modal isVisible={showModal} onClose={() => setShowModal(false)} title="Adicionar novo registro" titleColor="text-palette-pink">
+            <Modal isVisible={showModal} onClose={() => setShowModal(false)} title="Adicionar novo registro" titleColor="text-palette-blue">
                 <CreateRegForm setShowModal={setShowModal} />
             </Modal>
         </>

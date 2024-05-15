@@ -88,7 +88,7 @@ export const createRegSchema = z.object({
     title: z.string().min(3, "Campo título é obrigatório"),
     date_due: z.string().max(10).min(10, "Preencha o campo de data corretamente"),
     action: z.enum(['Desenvolvimento', 'Dashboard', 'Fluxograma', 'Apresentação', 'Pesquisa']),
-    participants: z.string().min(2, "Obrigatório dois participantes, no mínimo"),
+    participants: z.string(),
     description: z.string().min(10, "Insira uma descrição válida."),
     url: z.string(),
 })
